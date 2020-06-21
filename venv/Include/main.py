@@ -1,4 +1,5 @@
 import pygame
+from snake import Snake
 
 pygame.init()
 screen_x = 420
@@ -11,7 +12,9 @@ gameOver = False
 snake_x = 200
 snake_y = 140
 width_height = 20
-movement = "up"
+moveDirection = "up"
+
+snek = Snake(screen_x, screen_y, snake_x, snake_y, width_height, moveDirection)
 
 def drawBackground():
     global screen_x, screen_y
@@ -20,28 +23,8 @@ def drawBackground():
     for j in range(0, screen_y, 20):
         pygame.draw.rect(gameDisplay,pygame.Color(255,255,255,255), pygame.Rect(0, j, screen_x, 1))
 
-def drawSnake():
-    global snake_x, snake_y
-    if (snake_x < 0):
-        snake_x = screen_x - width_height
-    if (snake_x > screen_x - width_height):
-        snake_x = 0
-    if (snake_y < 0):
-        snake_y = screen_y - width_height
-    if (snake_y > screen_y - width_height):
-        snake_y = 0
-    pygame.draw.rect(gameDisplay, pygame.Color(255, 255, 255, 255), pygame.Rect(snake_x, snake_y, 20, 20))
-
-def snakeMove():
-    global snake_x, snake_y
-    if (movement == "right"):
-        snake_x += width_height
-    if (movement == "down"):
-        snake_y += width_height
-    if (movement == "left"):
-        snake_x -= width_height
-    if(movement == "up"):
-        snake_y -= width_height
+def drawFood():
+    pass
 
 # game loop
 while not gameOver:
@@ -50,18 +33,19 @@ while not gameOver:
             gameOver = True
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_RIGHT:
-                movement = "right"
+                snek.setMoveDirection("right")
             elif event.key == pygame.K_DOWN:
-                movement = "down"
+                snek.setMoveDirection("down")
             elif event.key == pygame.K_LEFT:
-                movement = "left"
+                snek.setMoveDirection("left")
             elif event.key == pygame.K_UP:
-                movement = "up"
+                snek.setMoveDirection("up")
 
     gameDisplay.fill((0,0,0))
     drawBackground()
-    snakeMove()
-    drawSnake()
+    snek.update()
+    snek.draw(gameDisplay)
+    drawFood()
     pygame.display.update()
     clock.tick(5)
 
