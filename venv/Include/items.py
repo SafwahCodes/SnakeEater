@@ -1,4 +1,6 @@
 import pygame
+import random
+from utils import Point
 
 class Snake(object):
 
@@ -10,7 +12,7 @@ class Snake(object):
         self.width_height = width_height
         self.moveDirection = moveDirection
         self.pointsList = []
-        self.pointsList.append(Points(snake_x, snake_y))
+        self.pointsList.append(Point(snake_x, snake_y))
         self.length = len(self.pointsList)
 
     def draw(self, surface):
@@ -38,19 +40,46 @@ class Snake(object):
 
     def calculateWallClipping(self, point):
         if (point.x < 0):
-            point.x = point.x - self.width_height
+            point.x = self.screen_x - self.width_height
         if (point.x > self.screen_x - self.width_height):
             point.x = 0
         if (point.y < 0):
-            point.y = point.y - self.width_height
+            point.y = self.screen_y - self.width_height
         if (point.y > self.screen_y - self.width_height):
             point.y = 0
 
     def setMoveDirection(self, moveDirection):
         self.moveDirection = moveDirection
 
-class Points(object):
+    def getPointsList(self):
+        return self.pointsList
 
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
+class Food(object):
+
+    def __init__(self, screen_x, screen_y, width_height, screenCoords, usedCoordsList):
+        self.screen_x = screen_x
+        self.screen_y = screen_y
+        self.width_height = width_height
+        self.screen_coords = screenCoords
+        self.radius = int(width_height/2)
+        self.coords = self.getNewCoords(usedCoordsList)
+
+    def draw(self, surface):
+        pygame.draw.circle(surface, pygame.Color(150, 150, 150, 255), (self.coords.x + self.radius, self.coords.y + self.radius), self.radius)
+
+    def update(self):
+        pass
+
+    def getNewCoords(self, usedCoordsList):
+        while True:
+            tempCoords = random.choice(self.screen_coords) # generate new food coords
+            if (not self.inUsedCoordsList(tempCoords, usedCoordsList)): # check if coords clash with usedCoordsList
+                break
+        return tempCoords
+
+    def inUsedCoordsList(self, tempCoords, usedCoordsList):
+        for p in usedCoordsList:
+            if (tempCoords.x == p.x):
+                if (tempCoords.y == p.y):
+                    return True
+        return False

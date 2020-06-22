@@ -1,5 +1,7 @@
 import pygame
-from snake import Snake
+from items import Snake
+from items import Food
+from utils import Point
 
 pygame.init()
 screen_x = 420
@@ -16,15 +18,23 @@ moveDirection = "up"
 
 snek = Snake(screen_x, screen_y, snake_x, snake_y, width_height, moveDirection)
 
+def produceCoordsList():
+    coordsList = []
+    for i in range(0,screen_y+ width_height,width_height):
+        for j in range(0, screen_x+width_height, width_height):
+            coordsList.append(Point(j, i))
+            #print("({0}, {1})".format(j, i))
+    return coordsList
+
+screenCoords = produceCoordsList()
+rat = Food(screen_x, screen_y, width_height, screenCoords, snek.getPointsList())
+
 def drawBackground():
     global screen_x, screen_y
     for i in range(0, screen_x, 20):
         pygame.draw.rect(gameDisplay,pygame.Color(255,255,255,255), pygame.Rect(i, 0, 1, screen_y))
     for j in range(0, screen_y, 20):
         pygame.draw.rect(gameDisplay,pygame.Color(255,255,255,255), pygame.Rect(0, j, screen_x, 1))
-
-def drawFood():
-    pass
 
 # game loop
 while not gameOver:
@@ -45,7 +55,7 @@ while not gameOver:
     drawBackground()
     snek.update()
     snek.draw(gameDisplay)
-    drawFood()
+    rat.draw(gameDisplay)
     pygame.display.update()
     clock.tick(5)
 
