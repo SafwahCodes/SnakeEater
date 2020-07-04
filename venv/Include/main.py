@@ -2,7 +2,6 @@ import pygame
 from items import Snake
 from items import Food
 from utils import Point
-# testing switch user for commits
 
 pygame.init()
 screen_x = 420
@@ -21,14 +20,15 @@ snek = Snake(screen_x, screen_y, snake_x, snake_y, width_height, moveDirection)
 
 def produceCoordsList():
     coordsList = []
-    for i in range(0,screen_y+ width_height,width_height):
-        for j in range(0, screen_x+width_height, width_height):
-            coordsList.append(Point(j, i))
+    for i in range(0,screen_y,width_height):
+        for j in range(0, screen_x, width_height):
+            coordsList.append([j, i])
+            #coordsList.append(Point(j, i))
             #print("({0}, {1})".format(j, i))
     return coordsList
 
 screenCoords = produceCoordsList()
-rat = Food(screen_x, screen_y, width_height, screenCoords, snek.getPointsList())
+rat = Food(screen_x, screen_y, width_height, screenCoords, snek.getBody())
 
 def drawBackground():
     global screen_x, screen_y
@@ -37,6 +37,13 @@ def drawBackground():
     for j in range(0, screen_y, 20):
         pygame.draw.rect(gameDisplay,pygame.Color(255,255,255,255), pygame.Rect(0, j, screen_x, 1))
 
+def checkCollision():
+    snek_head_coords = snek.getHeadCoords()
+    rat_coords = rat.getCoords()
+    if (snek_head_coords[0] == rat_coords[0] and snek_head_coords[1] == rat_coords[1]):
+        snek.grow()
+        rat.getNewCoords(snek.getBody())
+
 # game loop
 while not gameOver:
     for event in pygame.event.get():
@@ -44,19 +51,23 @@ while not gameOver:
             gameOver = True
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_RIGHT:
-                snek.setMoveDirection("right")
+                snek.set_move_direction("right")
             elif event.key == pygame.K_DOWN:
-                snek.setMoveDirection("down")
+                snek.set_move_direction("down")
             elif event.key == pygame.K_LEFT:
-                snek.setMoveDirection("left")
+                snek.set_move_direction("left")
             elif event.key == pygame.K_UP:
-                snek.setMoveDirection("up")
+                snek.set_move_direction("up")
 
     gameDisplay.fill((0,0,0))
     drawBackground()
+
+    checkCollision() # check for collision
+
     snek.update()
     snek.draw(gameDisplay)
     rat.draw(gameDisplay)
+
     pygame.display.update()
     clock.tick(5)
 
