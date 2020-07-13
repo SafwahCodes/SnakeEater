@@ -38,11 +38,17 @@ def drawBackground():
         pygame.draw.rect(gameDisplay,pygame.Color(255,255,255,255), pygame.Rect(0, j, screen_x, 1))
 
 def checkCollision():
+    global gameOver
     snek_head_coords = snek.getHeadCoords()
     rat_coords = rat.getCoords()
     if (snek_head_coords[0] == rat_coords[0] and snek_head_coords[1] == rat_coords[1]):
         snek.grow()
         rat.getNewCoords(snek.getBody())
+        return
+    # check snake-snake collision
+    snek_body_coords = snek.getBody()
+    snek_body_coords_without_head = snek_body_coords[1:]
+    gameOver = snek.check_self_collision()
 
 # game loop
 while not gameOver:
@@ -62,11 +68,11 @@ while not gameOver:
     gameDisplay.fill((0,0,0))
     drawBackground()
 
-    checkCollision() # check for collision
-
     snek.update()
     snek.draw(gameDisplay)
     rat.draw(gameDisplay)
+
+    checkCollision() # check for collision with food or with self
 
     pygame.display.update()
     clock.tick(5)

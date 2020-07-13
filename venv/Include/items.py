@@ -17,12 +17,10 @@ class Snake(object):
         self.length = len(self.body)
 
     def draw(self, surface):
-        for i, p in enumerate(self.body):
-            if (i ==0):
-                color = pygame.Color(128, 128, 128, 255)
-            else:
-                color = pygame.Color(255, 255, 255, 255)
-            pygame.draw.rect(surface, color, pygame.Rect(p[0], p[1], self.width_height, self.width_height))
+        # draw rest of body before head to that head appears on top of body during self collision
+        for i, p in enumerate(self.body[1:]):
+            pygame.draw.rect(surface, pygame.Color(255, 255, 255, 255), pygame.Rect(p[0], p[1], self.width_height, self.width_height))
+        pygame.draw.rect(surface, pygame.Color(128, 128, 128, 255), pygame.Rect(self.head[0], self.head[1], self.width_height, self.width_height))
 
     def update(self):
         move_x = 0
@@ -36,6 +34,7 @@ class Snake(object):
             new_head_pos = [self.body[0][0] - self.width_height, self.body[0][1]]
         elif (self.move_direction == "up"):
             new_head_pos = [self.body[0][0], self.body[0][1] - self.width_height]
+        self.head = new_head_pos
         if (len(self.body) > 1):
             # this works by shifting the positions of self.body[1:] forward such that
             # self.body[1] becomes pos self.body[0] before it had been updated,
@@ -98,6 +97,10 @@ class Snake(object):
             delta_y = last_coords[1] - second_last_coords[1]
             self.body.append([last_coords[0] + delta_x, last_coords[1] + delta_y])
         self.length = len(self.body)
+
+    def check_self_collision(self): # doesn't work. need to fix
+        if (self.length > 1):
+            return self.head in self.body[1:]
 
 class Food(object):
 
