@@ -1,6 +1,5 @@
 import pygame
 import random
-from utils import Point
 
 class Snake(object):
     body = []
@@ -98,19 +97,26 @@ class Snake(object):
             self.body.append([last_coords[0] + delta_x, last_coords[1] + delta_y])
         self.length = len(self.body)
 
-    def check_self_collision(self): # doesn't work. need to fix
+    def has_self_collision(self):
         if (self.length > 1):
             return self.head in self.body[1:]
 
 class Food(object):
 
-    def __init__(self, screen_x, screen_y, width_height, screenCoords, usedCoordsList):
+    def __init__(self, screen_x, screen_y, width_height, usedCoordsList):
         self.screen_x = screen_x
         self.screen_y = screen_y
         self.width_height = width_height
-        self.screen_coords = screenCoords
+        self.screen_coords = self.produceCoordsList()
         self.radius = int(width_height/2)
         self.getNewCoords(usedCoordsList)
+
+    def produceCoordsList(self):
+        coordsList = []
+        for i in range(0, self.screen_y, self.width_height):
+            for j in range(0, self.screen_x, self.width_height):
+                coordsList.append([j, i])
+        return coordsList
 
     def draw(self, surface):
         pygame.draw.circle(surface, pygame.Color(150, 150, 150, 255), (self.coords[0] + self.radius, self.coords[1] + self.radius), self.radius)
