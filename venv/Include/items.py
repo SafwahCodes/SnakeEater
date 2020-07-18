@@ -5,7 +5,7 @@ class Snake(object):
     body = []
     turns = {}
 
-    def __init__(self, screen_x, screen_y, snake_x, snake_y, width_height, move_direction):
+    def __init__(self, screen_x, screen_y, snake_x, snake_y, width_height, move_direction, hard_difficulty=False):
         self.screen_x = screen_x
         self.screen_y = screen_y
         self.width_height = width_height
@@ -14,6 +14,7 @@ class Snake(object):
         self.body = []
         self.body.append(self.head)
         self.length = len(self.body)
+        self.hard_difficulty = hard_difficulty
 
     def draw(self, surface):
         # draw rest of body before head to that head appears on top of body during self collision
@@ -53,14 +54,15 @@ class Snake(object):
             self.calculateWallClipping(self.body[0])
 
     def calculateWallClipping(self, point):
-        if (point[0] < 0):
-            point[0] = self.screen_x - self.width_height
-        if (point[0] > self.screen_x - self.width_height):
-            point[0] = 0
-        if (point[1] < 0):
-            point[1] = self.screen_y - self.width_height
-        if (point[1] > self.screen_y - self.width_height):
-            point[1] = 0
+        if not self.hard_difficulty:
+            if (point[0] < 0):
+                point[0] = self.screen_x - self.width_height
+            if (point[0] > self.screen_x - self.width_height):
+                point[0] = 0
+            if (point[1] < 0):
+                point[1] = self.screen_y - self.width_height
+            if (point[1] > self.screen_y - self.width_height):
+                point[1] = 0
 
     def set_move_direction(self, move_direction):
         # move_direction == "right" and not self.move_direction == "left" or move_direction == "down" and not self.move_direction == "up" or move_direction == "left" and not self.move_direction == "right" or move_direction == "up" and not self.move_direction == "down"

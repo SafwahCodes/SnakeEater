@@ -26,24 +26,26 @@ while main_loop_running:
         if game_update_status == 1: # 1 - Easy gameplay
             scene = GameScene(screen_x, screen_y, width_height)
         else: # 2 - Hard gameplay (create gameplay later)
-            scene = GameScene(screen_x, screen_y, width_height) # modify later for hard gameplay
+            scene = GameScene(screen_x, screen_y, width_height, hard_difficulty=True) # modify later for hard gameplay
         continue
     if scene.get_scene_type() == 2 and game_update_status != None:
         if game_update_status == 1: # 1 - pause screen
-            # later change to pause screen
             temp_scene = scene # save game scene to resume later
             scene = MenuPauseScene(screen_x, screen_y)
-        else: # 2 - game over screen
-            # later change to game over screen and reset game
-            scene = MenuPauseScene(screen_x, screen_y, True)
-        continue # skip to next iteration of loop
+        elif game_update_status == 2: # 2 - game over screen (easy)
+            scene = MenuPauseScene(screen_x, screen_y, game_over=True)
+        else: # 3 - game over screen (hard)
+            scene = MenuPauseScene(screen_x, screen_y, game_over=True, hard_difficulty=True)
+        continue
     if scene.get_scene_type() == 3 and game_update_status != None:
-        if game_update_status == 1: # 1 - play again (restart)
+        if game_update_status == 1: # 1 - play again (easy)
             scene = GameScene(screen_x, screen_y, width_height)
         elif game_update_status == 2: # 2 - return to main menu
             scene = MenuMainScene(screen_x, screen_y)
-        else: # 3 - resume gameplay
+        elif game_update_status == 3: # 3 - resume gameplay
             scene = temp_scene
+        else: # 4 - play again (hard)
+            scene = GameScene(screen_x, screen_y, width_height, hard_difficulty=True)
         continue
     scene.draw(surface)
 

@@ -21,10 +21,13 @@ class Scene(object):
 
 class MenuPauseScene(Scene):
 
-    def __init__(self, screen_x, screen_y, game_over=False):
+    def __init__(self, screen_x, screen_y, game_over=False, hard_difficulty=False):
         self.menu = pygame_menu.Menu(screen_y, screen_x, 'Game Over', theme=pygame_menu.themes.THEME_DARK)
         if game_over:
-            self.menu.add_button('Play again? (Easy)', self.play_restart_button_action)
+            if hard_difficulty:
+                self.menu.add_button('Play again? (Hard)', self.play_hard_restart_button_action)
+            else:
+                self.menu.add_button('Play again? (Easy)', self.play_easy_restart_button_action)
         else:
             self.menu.add_button('Resume game', self.play_resume_button_action)
         self.menu.add_button('Exit to main menu', self.return_button_action) # exit whole program
@@ -37,8 +40,11 @@ class MenuPauseScene(Scene):
     def get_scene_type(self):
         return 3
 
-    def play_restart_button_action(self):
+    def play_easy_restart_button_action(self):
         self.return_value = 1
+
+    def play_hard_restart_button_action(self):
+        self.return_value = 4
 
     def play_resume_button_action(self):
         self.return_value = 3
@@ -78,13 +84,13 @@ class MenuMainScene(Scene):
 
 class GameScene(Scene):
 
-    def __init__(self, screen_x, screen_y, width_height): # add difficulty flag later
+    def __init__(self, screen_x, screen_y, width_height, hard_difficulty=False): # add difficulty flag later
         self.screen_x = screen_x
         self.screen_y = screen_y
         self.width_height = width_height
 
         # init snake
-        self.reset_snek()
+        self.reset_snek(hard_difficulty)
 
         # init food
         self.rat = Food(self.screen_x, self.screen_y, self.width_height, self.snek.getBody())
@@ -94,11 +100,11 @@ class GameScene(Scene):
     def get_scene_type(self):
         return 2
 
-    def reset_snek(self):
+    def reset_snek(self, hard_difficulty):
         self.snake_x = (self.screen_x / 2) - (self.width_height / 2)
         self.snake_y = (self.screen_y / 2) - (self.width_height / 2)
         self.moveDirection = "up"
-        self.snek = Snake(self.screen_x, self.screen_y, self.snake_x, self.snake_y, self.width_height, self.moveDirection)
+        self.snek = Snake(self.screen_x, self.screen_y, self.snake_x, self.snake_y, self.width_height, self.moveDirection, hard_difficulty)
 
     def check_snake_food_collision(self):
         snek_head_coords = self.snek.getHeadCoords()
@@ -110,6 +116,10 @@ class GameScene(Scene):
 
     def has_snake_snake_collision(self):
         return self.snek.has_self_collision()
+
+    def has_snake_wall_collision(self):
+        snek_head_coords = self.snek.getHeadCoords()
+        return snek_head_coords[0] < 0 or snek_head_coords[0] > self.screen_x or snek_head_coords[1] < 0 or snek_head_coords[1] > self.screen_y
 
     def drawBackground():
         global screen_x, screen_y
@@ -157,7 +167,9 @@ class GameScene(Scene):
         # collision update
         self.check_snake_food_collision()
         if self.has_snake_snake_collision():
-            return 2 # game over
+            return 2 # game over (easy)
+        if self.has_snake_wall_collision():
+            return 3 # game over (hard)
 
     def handle_events(self, events):
         pass
