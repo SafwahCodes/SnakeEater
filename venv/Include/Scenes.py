@@ -19,6 +19,37 @@ class Scene(object):
     def get_scene_type(self):
         raise NotImplementedError
 
+class MenuPauseScene(Scene):
+
+    def __init__(self, screen_x, screen_y, game_over=False):
+        self.menu = pygame_menu.Menu(screen_y, screen_x, 'Game Over', theme=pygame_menu.themes.THEME_DARK)
+        if game_over:
+            self.menu.add_button('Play again? (Easy)', self.play_restart_button_action)
+        else:
+            self.menu.add_button('Resume game', self.play_resume_button_action)
+        self.menu.add_button('Exit to main menu', self.return_button_action) # exit whole program
+        self.menu.add_button('Exit to desktop', pygame_menu.events.EXIT) # exit whole program
+        self.return_value = None
+
+    def return_button_action(self):
+        self.return_value = 2
+
+    def get_scene_type(self):
+        return 3
+
+    def play_restart_button_action(self):
+        self.return_value = 1
+
+    def play_resume_button_action(self):
+        self.return_value = 3
+
+    def draw(self, surface):
+        self.menu.draw(surface)
+
+    def update(self, events):
+        self.menu.update(events)
+        return self.return_value
+
 class MenuMainScene(Scene):
 
     def __init__(self, screen_x, screen_y):
@@ -27,7 +58,7 @@ class MenuMainScene(Scene):
         self.menu.add_selector('Difficulty: ', [('Easy', 1),('Hard', 2)], onchange=self.set_difficulty)
         self.menu.add_button('Exit', pygame_menu.events.EXIT) # exit whole program
         self.return_value = None
-        self.hold_difficulty_value = None
+        self.hold_difficulty_value = 1
 
     def set_difficulty(self, difficulty, value):
         self.hold_difficulty_value = value
