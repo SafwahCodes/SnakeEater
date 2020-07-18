@@ -1,4 +1,5 @@
 import pygame
+import pygame_menu
 from items import Snake, Food
 
 class Scene(object):
@@ -15,18 +16,38 @@ class Scene(object):
     def handle_events(self, events):
         raise NotImplementedError
 
-    def is_game_scene(self):
+    def get_scene_type(self):
         raise NotImplementedError
 
-    def is_menu_main_scene(self):
-        raise NotImplementedError
+class MenuMainScene(Scene):
 
-    def is_menu_pause_scene(self):
-        raise NotImplementedError
+    def __init__(self, screen_x, screen_y):
+        self.menu = pygame_menu.Menu(screen_y, screen_x, 'Snake Eater', theme=pygame_menu.themes.THEME_DARK)
+        self.menu.add_button('Play', self.play_button_action)
+        self.menu.add_selector('Difficulty: ', [('Easy', 1),('Hard', 2)], onchange=self.set_difficulty)
+        self.menu.add_button('Exit', pygame_menu.events.EXIT) # exit whole program
+        self.return_value = None
+        self.hold_difficulty_value = None
+
+    def set_difficulty(self, difficulty, value):
+        self.hold_difficulty_value = value
+
+    def get_scene_type(self):
+        return 1
+
+    def play_button_action(self):
+        self.return_value = self.hold_difficulty_value
+
+    def draw(self, surface):
+        self.menu.draw(surface)
+
+    def update(self, events):
+        self.menu.update(events)
+        return self.return_value
 
 class GameScene(Scene):
 
-    def __init__(self, screen_x, screen_y, width_height):
+    def __init__(self, screen_x, screen_y, width_height): # add difficulty flag later
         self.screen_x = screen_x
         self.screen_y = screen_y
         self.width_height = width_height
@@ -39,14 +60,8 @@ class GameScene(Scene):
 
         # init walls (maybe) for harder difficulties
 
-    def is_game_scene(self):
-        return True
-
-    def is_menu_main_scene(self):
-        return False
-
-    def is_menu_pause_scene(self):
-        return False
+    def get_scene_type(self):
+        return 2
 
     def reset_snek(self):
         self.snake_x = (self.screen_x / 2) - (self.width_height / 2)
@@ -116,17 +131,3 @@ class GameScene(Scene):
     def handle_events(self, events):
         pass
 
-
-class MenuMainScene(Scene):
-
-    def __init__(self):
-        pass
-
-    def draw(self, surface):
-        pass
-
-    def update(self):
-        pass
-
-    def handle_events(self, events):
-        pass
